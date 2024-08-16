@@ -58,6 +58,8 @@ const MapComponent: React.FC = () => {
     };
 
     console.log(`mt-4 grid grid-cols-${Object.keys(reviews).length < 13 ? Object.keys(reviews).length : 12} gap-4`)
+    const columns = Math.min(Object.keys(reviews).length, 12);
+
     return (
       <div className="w-full">
         <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}>
@@ -73,7 +75,10 @@ const MapComponent: React.FC = () => {
         </LoadScript>
   
         {/* Display reviews */}
-        <div className={`mt-4 grid grid-cols-${Object.keys(reviews).length < 13 ? Object.keys(reviews).length : 12} gap-4`}>
+        {Object.keys(reviews).length < 13 ? Object.keys(reviews).length : 12} reviews displayed
+        <div 
+        className={`mt-4 grid grid-cols-${columns} gap-4`}
+        >
          
           {  
           Object.keys(reviews).map((name) => (
