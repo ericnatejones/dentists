@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Theme Variables */
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+  color: purple;
+
+}
+
+/* Dark Mode Theme Variables */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+/* Global Body Styles */
+body {
+  @apply text-base leading-relaxed antialiased;
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+
+
+/* Additional Custom Styles */
+
+/* Global Link Styles */
+a {
+  color: rgb(var(--foreground-rgb));
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: rgb(var(--foreground-rgb));
+  text-decoration: underline;
+}
+
+/* Button Styles */
+button {
+  @apply bg-blue-500 text-white font-semibold py-2 px-4 rounded;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  @apply bg-blue-600;
+}
+
+/* Form Elements */
+input, textarea, select {
+  @apply border border-gray-300 rounded-lg py-2 px-4;
+  background-color: rgb(var(--background-start-rgb));
+  color: rgb(var(--foreground-rgb));
+  transition: border-color 0.3s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  @apply border-blue-500;
+  outline: none;
+}
+
+/* Container Padding */
+.container {
+  @apply mx-auto px-4;
+  max-width: 1200px;
+}
+
+/* Utility Classes */
+.hidden {
+  display: none;
+}
+
+.flex-center {
+  @apply flex items-center justify-center;
+}
+
+/* Card Component Styles */
+.card {
+  @apply bg-white shadow-md rounded-lg p-6;
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  @apply shadow-lg;
+}
+
+/* Heading Styles */
+h1, h2, h3, h4, h5, h6 {
+  @apply font-bold text-gray-900;
+}
+
+/* Footer Styles */
+footer {
+  @apply bg-gray-800 text-white py-4;
+  text-align: center;
+}
+
+/* Accessibility
+sr-only {
+  @apply absolute clip overflow-hidden h-1 w-1 p-0 m-0 border-0;
+  clip: rect(0, 0, 0, 0);
+  position: absolute;
+} */
