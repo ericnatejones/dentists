@@ -1,6 +1,6 @@
 "use client"
 import axios from 'axios';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 const containerStyle = {
@@ -42,8 +42,47 @@ const testDentists = [
   }
 ];
 
+interface Dentist {
+  id: number;
+  name: string;
+  position: {
+    lat: number;
+    lng: number;
+  };
+  placeId: string;
+}
+
+
 const MapComponent: React.FC = () => {
     const [reviews, setReviews] = useState<{ [key: string]: any[] }>({});
+    const [dentists, setDentists] = useState<Dentist[]>([]);
+
+    useEffect(() => {
+      const fetchDentists = async () => {
+        try {
+          const response = await axios.post('/api/dentists');
+  
+          // Map the response data to the desired format
+          const formattedDentists: Dentist[] = response.data.map((place: any, index: number) => ({
+            id: index + 1, // Assigning an ID based on the index
+            name: place.name,
+            position: {
+              lat: place.geometry.location.lat,
+              lng: place.geometry.location.lng,
+            },
+            placeId: place.place_id,
+          }));
+  
+          // Save the formatted data in state
+          setDentists(formattedDentists);
+        } catch (error) {
+          console.error('Error fetching dentists:', error);
+        }
+      };
+  
+      fetchDentists();
+    }, []);
+
     const fetchReviews = async (placeId: string, name: string) => {
       try {
         const response = await axios.post('/api/reviews', { placeId, name });
@@ -64,7 +103,7 @@ const MapComponent: React.FC = () => {
       <div className="w-full">
         <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}>
           <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={10}>
-            {testDentists.map((dentist) => (
+            {dentists.map((dentist) => (
               <Marker
                 key={dentist.id}
                 position={dentist.position}
