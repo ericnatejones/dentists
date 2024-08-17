@@ -4,12 +4,12 @@ import axios from 'axios';
 const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 export async function POST(request: Request) {
-  
+  const { searchQuery } = await request.json();
   try {
     const response = await axios.get('https://maps.googleapis.com/maps/api/place/textsearch/json', {
       
       params: {
-        query: 'dentists+in+Salt+Lake+City',
+        query: "dentists in" + searchQuery,
         key: GOOGLE_API_KEY,
       },
       

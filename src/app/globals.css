@@ -1,116 +1,73 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* styles/custom-utilities.css */
+@layer utilities {
+  .btn {
+    @apply bg-primary text-white font-semibold py-2 px-4 rounded-lg shadow-lg;
+  }
 
-/* Custom Theme Variables */
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-  color: purple;
-
-}
-
-/* Dark Mode Theme Variables */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+  .btn-secondary {
+    @apply bg-secondary text-white font-semibold py-2 px-4 rounded-lg shadow-lg;
   }
 }
 
-/* Global Body Styles */
+
 body {
-  @apply text-base leading-relaxed antialiased;
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  @apply bg-gray-50 text-gray-800;
+  font-family: 'Inter', sans-serif;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  @apply font-bold;
+}
 
-
-/* Additional Custom Styles */
-
-/* Global Link Styles */
 a {
-  color: rgb(var(--foreground-rgb));
+  @apply text-primary hover:text-secondary;
   text-decoration: none;
-  transition: color 0.3s ease;
 }
 
-a:hover {
-  color: rgb(var(--foreground-rgb));
-  text-decoration: underline;
-}
-
-/* Button Styles */
 button {
-  @apply bg-blue-500 text-white font-semibold py-2 px-4 rounded;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  @apply bg-primary text-white py-2 px-4 rounded hover:bg-secondary;
 }
 
-button:hover {
-  @apply bg-blue-600;
+/* styles.css */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
 }
 
-/* Form Elements */
-input, textarea, select {
-  @apply border border-gray-300 rounded-lg py-2 px-4;
-  background-color: rgb(var(--background-start-rgb));
-  color: rgb(var(--foreground-rgb));
-  transition: border-color 0.3s ease;
-}
-
-input:focus, textarea:focus, select:focus {
-  @apply border-blue-500;
-  outline: none;
-}
-
-/* Container Padding */
 .container {
-  @apply mx-auto px-4;
   max-width: 1200px;
 }
 
-/* Utility Classes */
-.hidden {
-  display: none;
+.map-container {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.flex-center {
-  @apply flex items-center justify-center;
+h1 {
+  color: #1e40af;
 }
 
-/* Card Component Styles */
-.card {
-  @apply bg-white shadow-md rounded-lg p-6;
-  transition: box-shadow 0.3s ease;
+h2 {
+  color: #1e3a8a;
 }
 
-.card:hover {
-  @apply shadow-lg;
-}
-
-/* Heading Styles */
-h1, h2, h3, h4, h5, h6 {
-  @apply font-bold text-gray-900;
-}
-
-/* Footer Styles */
 footer {
-  @apply bg-gray-800 text-white py-4;
-  text-align: center;
+  background-color: #1e40af;
 }
 
-/* Accessibility
-sr-only {
-  @apply absolute clip overflow-hidden h-1 w-1 p-0 m-0 border-0;
-  clip: rect(0, 0, 0, 0);
-  position: absolute;
-} */
+footer p {
+  font-size: 0.875rem;
+}
+
+.bg-blue-700 {
+  background-color: #1e40af;
+}
+
+.text-blue-700 {
+  color: #1e40af;
+}

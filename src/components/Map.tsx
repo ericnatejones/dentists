@@ -1,46 +1,13 @@
-"use client"
-import axios from 'axios';
-import { useState, useEffect } from 'react';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import axios from "axios";
+import { useState, useEffect } from "react";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
 const containerStyle = {
-  width: '100%',
-  height: '400px',
+  width: "100%",
+  height: "400px",
 };
 
-const center = {
-  lat: 40.73061, // New York City as the default center
-  lng: -111.882602,
-};
 
-// Test array of dentists with coordinates and Google Place IDs
-const testDentists = [
-  {
-    id: 1,
-    name: "Village Dental",
-    position: { lat: 40.63878400000001, lng: -111.882602 },
-    placeId: "ChIJn7GLiothUocRu5AufVW5xks"
-  },
-  {
-    id: 2,
-    name: "Salt Flats at Cottonwood",
-    position: { lat: 40.6672784, lng: -111.96676 },
-    placeId: "ChIJYXQkYpWJUocR1rHAnIUw2mI"
-  },
-  {
-    id: 3,
-    name: "Canyon Rim Dental",
-    position: { lat: 40.6995777, lng: -111.8184336 },
-    placeId: "ChIJabppfqVhUocRCmy2n75Infc"
-  },
-  {
-    id: 4,
-    name: "Genesis Dental of Salt Lake",
-    position: { lat : 40.7655187, lng : -111.893706},
-    placeId: "ChIJDxNuBGP1UocRrG7CSpVgDB8"
-    
-  }
-];
 
 interface Dentist {
   id: number;
@@ -51,19 +18,24 @@ interface Dentist {
   };
   placeId: string;
 }
+interface MapComponentProps {
+  searchQuery: string;
+  searchActive: boolean;
+}
+const MapComponent: React.FC<MapComponentProps> = ({ searchQuery, searchActive }) => {
+  const [reviews, setReviews] = useState<{ [key: string]: any[] }>({});
+  const [dentists, setDentists] = useState<Dentist[]>([]);
+  const [mapLoaded, setMapLoaded] = useState<boolean>(false); // Track if map is loaded
 
 
-const MapComponent: React.FC = () => {
-    const [reviews, setReviews] = useState<{ [key: string]: any[] }>({});
-    const [dentists, setDentists] = useState<Dentist[]>([]);
+  useEffect(() => {
+    const fetchDentists = async () => {
+      try {
+        const response = await axios.post("/api/dentists", {searchQuery});
 
-    useEffect(() => {
-      const fetchDentists = async () => {
-        try {
-          const response = await axios.post('/api/dentists');
-  
-          // Map the response data to the desired format
-          const formattedDentists: Dentist[] = response.data.map((place: any, index: number) => ({
+        // Map the response data to the desired format
+        const formattedDentists: Dentist[] = response.data.map(
+          (place: any, index: number) => ({
             id: index + 1, // Assigning an ID based on the index
             name: place.name,
             position: {
@@ -71,71 +43,83 @@ const MapComponent: React.FC = () => {
               lng: place.geometry.location.lng,
             },
             placeId: place.place_id,
-          }));
-  
-          // Save the formatted data in state
-          setDentists(formattedDentists);
-        } catch (error) {
-          console.error('Error fetching dentists:', error);
-        }
-      };
-  
-      fetchDentists();
-    }, []);
+          })
+        );
 
-    const fetchReviews = async (placeId: string, name: string) => {
-      try {
-        const response = await axios.post('/api/reviews', { placeId, name });
-
-        setReviews((prevReviews) => ({
-          ...prevReviews,
-          [name]: response.data,
-        }));
+        // Save the formatted data in state
+        setDentists(formattedDentists);
       } catch (error) {
-        console.error('Yo, Error fetching reviews:', error);
+        console.error("Error fetching dentists:", error);
       }
     };
 
-    console.log(`mt-4 grid grid-cols-${Object.keys(reviews).length < 13 ? Object.keys(reviews).length : 12} gap-4`)
-    const columns = Math.min(Object.keys(reviews).length, 12);
+    fetchDentists();
+    return () => {
+      setDentists([]);
+      setReviews({});
+    };
+  }, []);
 
-    return (
-      <div className="w-full">
-        <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}>
-          <GoogleMap mapContainerStyle={containerStyle} center={center} zoom={10}>
-            {dentists.map((dentist) => (
-              <Marker
-                key={dentist.id}
-                position={dentist.position}
-                onClick={() => fetchReviews(dentist.placeId, dentist.name)}
-              />
-            ))}
-          </GoogleMap>
-        </LoadScript>
-  
-        {/* Display reviews */}
-        {Object.keys(reviews).length < 13 ? Object.keys(reviews).length : 12} reviews displayed
-        <div 
-        className={`mt-4 grid grid-cols-${columns} gap-4`}
-        >
-         
-          {  
-          Object.keys(reviews).map((name) => (
-            <div key={name} className="mb-4 col-span-1">
-              <h2 className="text-xl font-bold">Reviews for: {name}</h2>
-              <ul>
-                {reviews[name]?.map((review: any, index: number) => (
-                  <li key={index+name} className="mb-2 p-4 border border-gray-200 rounded-lg">
-                    <p><strong>{review.author_name}:</strong> {review.text}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
+  const fetchReviews = async (placeId: string, name: string) => {
+    try {
+      const response = await axios.post("/api/reviews", { placeId, name });
+
+      setReviews((prevReviews) => ({
+        ...prevReviews,
+        [name]: response.data,
+      }));
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    }
+  };
+
+  const columns = Math.min(Object.keys(reviews).length, 12);
+
+  return (
+     <div className="w-full">{searchActive &&
+      <LoadScript
+        googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}
+        onLoad={() => setMapLoaded(true)} // Set mapLoaded to true when script is loaded
+        onError={() => console.error('Failed to load Google Maps script')}
+      >
+        <GoogleMap mapContainerStyle={containerStyle} center={dentists[0]?.position || {lat: 40, lng: -111}} zoom={10}>
+          {dentists.map((dentist) => (
+            <Marker
+              key={dentist.id}
+              position={dentist.position}
+              onClick={() => fetchReviews(dentist.placeId, dentist.name)}
+            />
           ))}
-        </div>
-      </div>
-    );
-};
+        </GoogleMap>
+      </LoadScript>}
 
+      {/* Display reviews */}
+      <div className={`mt-8 grid grid-cols-${columns} gap-6`}>
+        {Object.keys(reviews).map((name) => (
+          <div
+            key={name}
+            className="bg-white p-6 shadow-lg rounded-lg col-span-1"
+          >
+            <h2 className="text-2xl font-bold mb-4 text-blue-700">
+              Reviews for: {name}
+            </h2>
+            <ul className="space-y-4">
+              {reviews[name]?.map((review: any, index: number) => (
+                <li
+                  key={index + name}
+                  className="p-4 border border-gray-200 rounded-lg"
+                >
+                  <p>
+                    <strong>{review.author_name}:</strong> {review.text}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export default MapComponent;
