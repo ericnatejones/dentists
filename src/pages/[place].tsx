@@ -2,6 +2,8 @@
 import { useRouter } from 'next/router';
 import MapComponent from '../components/Map'; // Adjust the path according to your project structure
 import Layout from '../components/Layout'
+import "../app/globals.css";
+
 
 const SearchResultsPage: React.FC = () => {
   const router = useRouter();
