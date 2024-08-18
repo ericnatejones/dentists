@@ -23,8 +23,8 @@ export default function Card({ dentist }: Props) {
       <div className="p-4">
         <h3 className="text-xl font-semibold mb-2">{dentist.name}</h3>
         <p className="text-sm text-gray-600 mb-1">Rating: {dentist.rating} ★</p>
-        <p className="text-sm text-gray-600 mb-1">Address: {dentist.address}</p>
-        <p className="text-sm text-gray-600">Status: {dentist.status}</p>
+        <p className="text-xs text-gray-600 mb-1">{dentist.address}</p>
+        <p className="text-sm text-red-600">{dentist.isOpen ? "open" : "closed"}</p>
       </div>
     </div>
   );

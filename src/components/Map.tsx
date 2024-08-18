@@ -23,7 +23,8 @@ export interface Dentist {
   address: string;
   status: string;
   imageUrl: string;
-  photos: Photo[]
+  photos: Photo[];
+  isOpen: boolean;
 }
 
 interface MapComponentProps {
@@ -51,10 +52,10 @@ const MapComponent: React.FC<MapComponentProps> = ({ searchQuery, searchActive }
             },
             placeId: place.place_id,
             rating: place.rating || 0,
-            address: place.vicinity || "Unknown Address",
+            address: place.formatted_address || "Unknown Address",
             status: place.business_status || "Operational",
             photos: place.photos,
-            opening_hours: place.opening_hours
+            isOpen: place.opening_hours.open_now
           })
         );
         console.log(response.data[0].photos[0].photo_reference)
