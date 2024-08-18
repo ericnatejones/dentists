@@ -71,3 +71,8 @@ footer p {
 .text-blue-700 {
   color: #1e40af;
 }
+
+
+a:hover {
+  transition: color 0.3s ease-in-out;
+}

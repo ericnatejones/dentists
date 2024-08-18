@@ -1,41 +1,42 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import MapComponent from '../components/Map'; // Adjust the path according to your project structure
 
-
 const SearchDentists: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [inputValue, setInputValue] = useState<string>(''); // Tracks input value
+  const [searchQuery, setSearchQuery] = useState<string>(''); // Tracks submitted query
   const [searchActive, setSearchActive] = useState<boolean>(false);
 
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
+    if (inputValue.trim()) {
+      setSearchQuery(inputValue); // Update searchQuery when form is submitted
       setSearchActive(true);
-      // Trigger search logic here, such as API calls or state updates
     }
   };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    setSearchActive(false);
+    setInputValue(e.target.value); // Update inputValue on keystroke
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100 p-4">
-      <div className={`transition-all duration-500 ease-in-out ${searchActive ? 'w-full md:w-3/4' : 'w-full md:w-1/2'}`}>
-        <h1 className={`text-3xl md:text-5xl font-bold text-center mb-4 ${searchActive ? 'hidden' : 'block'}`}>
-          Search for Dentists in
+    <div className="items-center justify-center bg-white p-10 rounded-lg shadow-xl transition-all duration-500 ease-in-out">
+      {/* Conditional rendering of heading and search form */}
+      <div className={`transition-all duration-500 ease-in-out ${searchActive ? 'hidden' : 'w-full'}`}>
+        <h1 className="text-4xl md:text-5xl font-bold text-center mb-8 text-gray-800 transition-all duration-500 ease-in-out">
+          Search for Trusted Dentists
         </h1>
-        <form onSubmit={handleSearch} className="flex items-center justify-center">
+
+        <form onSubmit={handleSearch} className="flex items-center w-full">
           <input
             type="text"
             placeholder="Enter a location..."
-            value={searchQuery}
-            onChange={handleInputChange}
-            className={`w-full ${searchActive ? 'md:w-1/2' : 'md:w-full'} px-6 py-4 text-2xl md:text-3xl border border-gray-300 rounded-full focus:outline-none focus:ring-4 focus:ring-primary focus:ring-opacity-50 transition-all duration-500 ease-in-out`}
+            value={inputValue} // Bind input value to the input field
+            onChange={handleInputChange} // Update inputValue on change
+            className="w-full px-6 py-4 text-xl md:text-2xl border border-gray-300 rounded-l-full focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-500 ease-in-out"
           />
           <button
             type="submit"
-            className={`ml-4 px-6 py-4 bg-primary text-white text-xl md:text-2xl font-semibold rounded-full shadow-lg hover:bg-secondary focus:outline-none transition-all duration-500 ease-in-out ${searchActive ? 'hidden' : 'block'}`}
+            className="px-8 py-4 bg-blue-600 text-white text-xl md:text-2xl font-semibold rounded-r-full shadow-lg hover:bg-blue-700 focus:outline-none transition-all duration-500 ease-in-out"
           >
             Search
           </button>
@@ -43,19 +44,9 @@ const SearchDentists: React.FC = () => {
       </div>
 
       {/* Conditional rendering of map and results based on searchActive */}
-        <div className="mt-8 w-full">
-        <h2 className="text-2xl md:text-3xl font-semibold">Map and Results</h2>
-
-      {searchActive ? (
-            <div className="map-container mb-12 shadow-lg rounded-lg overflow-hidden">
-                <MapComponent searchQuery={searchQuery} searchActive={searchActive}/>
-            </div>
-            ):(
-            <div className="text-center">
-                <p className="mt-4 text-lg">Your search results will appear here.</p>
-            </div>
+      {searchActive && (
+            <MapComponent searchQuery={searchQuery} searchActive={searchActive} />
       )}
-        </div>
     </div>
   );
 };
