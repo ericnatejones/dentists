@@ -1,25 +1,36 @@
-// Import necessary components and libraries
+
 'use client'
 import { NextPage } from 'next';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import SearchComponent from '../components/Search'; // Adjust the path according to your project structure
+import Layout from '../components/Layout'
+import React from 'react';
+import "../app/globals.css";
 
 const HomePage: NextPage = () => {
+  const router = useRouter();
+
+  // Define the handleSearch function
+  const handleSearch = (query: string) => {
+    if (query.trim()) {
+        const formattedQuery = query.trim().replace(/\s+/g, '-'); // Replace spaces with dashes
+        // Route to the search results page with the query as the slug
+      router.push(`/${formattedQuery}`);
+    }
+  };
+
   return (
-    <>
-      {/* Head component for meta tags and page title */}
+    <><Layout>
       <Head>
         <title>Dente - Your Trusted Dentist Finder</title>
         <meta name="description" content="Easily discover trusted dentists near you and book appointments effortlessly." />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
-      {/* Main container for the page content */}
+     
       <main className="relative bg-cover bg-center h-screen" style={{ backgroundImage: "url('/cuteteeth.jpg')" }}>
-        {/* Overlay */}
         <div className="absolute inset-0 bg-black opacity-50"></div>
 
-        {/* Content */}
         <div className="relative py-20 text-center">
           <h1 className="text-6xl font-extrabold text-white mb-8">
             Welcome to Dente
@@ -28,13 +39,16 @@ const HomePage: NextPage = () => {
             Find your perfect dentist.
           </p>
           
-          {/* Search Component */}
-            <div className='inline-block'>
-              <SearchComponent />
+          <div className='inline-block'>
+            <div className="items-center justify-center bg-white p-10 rounded-lg shadow-xl transition-all duration-500 ease-in-out">
+              <div className="transition-all duration-500 ease-in-out">
+                {/* Pass handleSearch as a prop */}
+                <SearchComponent handleSearch={handleSearch} />
+              </div>
             </div>
+          </div>
         </div>
 
-        {/* Additional content below the fold */}
         <section className="bg-white py-12">
           <div className="container mx-auto">
             <h2 className="text-4xl font-semibold mb-6 text-gray-800 text-center">
@@ -48,10 +62,10 @@ const HomePage: NextPage = () => {
         </section>
       </main>
 
-      {/* Footer section */}
       <footer className="bg-blue-700 text-white py-6 text-center">
         <p>&copy; {new Date().getFullYear()} Dentist Finder. All rights reserved.</p>
       </footer>
+    </Layout>
     </>
   );
 };
