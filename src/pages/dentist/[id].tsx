@@ -1,5 +1,3 @@
-// pages/dentist/[id].tsx
-
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -20,6 +18,7 @@ interface Dentist {
   website: string;
   isOpen: boolean;
   photos: { photo_reference: string }[];
+  place_id: string; // Ensure place_id is included
 }
 
 const DentistDetails: React.FC = () => {
@@ -34,25 +33,26 @@ const DentistDetails: React.FC = () => {
     if (id) {
       const fetchDentistDetails = async () => {
         try {
-          const response = await axios.post('/api/dentists', { searchQuery: id });
-          setDentist(response.data[0]);
+          const response = await axios.post('/api/place', { placeId: id });
+          setDentist(response.data);
         } catch (error) {
           console.error('Error fetching dentist details:', error);
         } finally {
           setLoading(false);
         }
       };
-
+  
       fetchDentistDetails();
     }
   }, [id]);
+  
 
   useEffect(() => {
     if (dentist) {
       const fetchReviews = async () => {
         try {
           const response = await axios.post('/api/reviews', { placeId: dentist.place_id });
-          setReviews(response.data);
+          setReviews(response.data); // Ensure data is in the expected format
         } catch (error) {
           console.error('Error fetching reviews:', error);
         }
@@ -93,7 +93,7 @@ const DentistDetails: React.FC = () => {
             <div className="bg-white p-8 rounded-lg shadow-lg">
               <h2 className="text-3xl font-semibold mb-4">Contact Details</h2>
               <p className="text-gray-700 mb-2"><strong>Phone:</strong> {dentist.phoneNumber}</p>
-              <p className="text-gray-700 mb-2"><strong>Website:</strong> <a href={dentist.website} className="text-blue-600">{dentist.website}</a></p>
+              <p className="text-gray-700 mb-2"><strong>Website:</strong> <a href={dentist.website} className="text-blue-600" target="_blank" rel="noopener noreferrer">{dentist.website}</a></p>
               <p className="text-gray-700"><strong>Status:</strong> {dentist.isOpen ? 'Open Now' : 'Closed'}</p>
             </div>
 
