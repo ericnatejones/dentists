@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Layout from '../../components/Layout';
+import '../../app/globals.css'
 
 interface Review {
   author_name: string;
@@ -10,15 +11,44 @@ interface Review {
   relative_time_description: string;
 }
 
+interface Photo {
+  photo_reference: string;
+}
+
+interface OpeningHoursPeriod {
+  close: { day: number; time: string };
+  open: { day: number; time: string };
+}
+
+interface OpeningHours {
+  open_now: boolean;
+  periods: OpeningHoursPeriod[];
+}
+
+interface Geometry {
+  location: {
+    lat: number;
+    lng: number;
+  };
+}
+
 interface Dentist {
   name: string;
   address: string;
+  formatted_address: string;
+  formatted_phone_number: string;
+  international_phone_number: string;
   rating: number;
-  phoneNumber: string;
+  place_id: string;
+  photos: Photo[];
   website: string;
   isOpen: boolean;
-  photos: { photo_reference: string }[];
-  place_id: string; // Ensure place_id is included
+  opening_hours: OpeningHours;
+  icon: string;
+  icon_background_color: string;
+  icon_mask_base_uri: string;
+  reviews: Review[];
+  wheelchair_accessible_entrance: boolean;
 }
 
 const DentistDetails: React.FC = () => {
@@ -41,11 +71,10 @@ const DentistDetails: React.FC = () => {
           setLoading(false);
         }
       };
-  
+
       fetchDentistDetails();
     }
   }, [id]);
-  
 
   useEffect(() => {
     if (dentist) {
@@ -77,7 +106,7 @@ const DentistDetails: React.FC = () => {
         <section className="bg-gradient-to-r from-blue-400 to-purple-400 text-white py-16">
           <div className="container mx-auto text-center">
             <h1 className="text-5xl font-bold">{dentist.name}</h1>
-            <p className="mt-4 text-xl">{dentist.address}</p>
+            <p className="mt-4 text-xl">{dentist.formatted_address}</p>
             <div className="mt-6">
               <span className="bg-yellow-400 text-gray-900 px-4 py-2 rounded-full">
                 Rating: {dentist.rating} ⭐
@@ -91,25 +120,28 @@ const DentistDetails: React.FC = () => {
           <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Contact Details Card */}
             <div className="bg-white p-8 rounded-lg shadow-lg">
-              <h2 className="text-3xl font-semibold mb-4">Contact Details</h2>
-              <p className="text-gray-700 mb-2"><strong>Phone:</strong> {dentist.phoneNumber}</p>
+              <h2 className="text-3xl font-semibold mb-4">{dentist.name}</h2>
+              <p className="text-gray-700 mb-2"><strong>Phone:</strong> {dentist.formatted_phone_number} ({dentist.international_phone_number})</p>
               <p className="text-gray-700 mb-2"><strong>Website:</strong> <a href={dentist.website} className="text-blue-600" target="_blank" rel="noopener noreferrer">{dentist.website}</a></p>
-              <p className="text-gray-700"><strong>Status:</strong> {dentist.isOpen ? 'Open Now' : 'Closed'}</p>
+              <p className="text-gray-700 mb-2"><strong>Status:</strong> {dentist.isOpen ? 'Open Now' : 'Closed'}</p>
+              <p className="text-gray-700"><strong>Wheelchair Accessible Entrance:</strong> {dentist.wheelchair_accessible_entrance ? 'Yes' : 'No'}</p>
             </div>
 
             {/* Photos Card */}
             {dentist.photos && dentist.photos.length > 0 && (
               <div className="bg-white p-8 rounded-lg shadow-lg">
                 <h2 className="text-3xl font-semibold mb-4">Photos</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {dentist.photos.map((photo, index) => (
-                    <img
-                      key={index}
-                      src={`https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.photo_reference}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
-                      alt={`Photo of ${dentist.name}`}
-                      className="w-full h-48 object-cover rounded-lg"
-                    />
-                  ))}
+                <div className="h-80 overflow-y-auto">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {dentist.photos.map((photo, index) => (
+                      <img
+                        key={index}
+                        src={`https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.photo_reference}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`}
+                        alt={`Photo of ${dentist.name}`}
+                        className="w-full h-48 object-cover rounded-lg"
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
