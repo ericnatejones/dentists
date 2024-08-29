@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import Card from './Card';
+import Link from "next/link";
 
 const containerStyle = {
   width: "100%",
@@ -97,7 +98,9 @@ const MapComponent: React.FC<MapComponentProps> = ({ place }) => {
 
       <div className="flex flex-col w-full md:w-1/3 p-4 space-y-4 overflow-y-auto" style={{ height: "calc(100vh - 0px)"}}>
         {dentists.map((dentist) => (
-          <Card key={dentist.id} dentist={dentist} />
+          <Link href={`/dentist/${dentist.placeId}`} key={dentist.id}>
+            <Card key={dentist.id} dentist={dentist} />
+          </Link>
         ))}
       </div>
     </div>

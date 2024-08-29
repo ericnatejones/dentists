@@ -3,22 +3,26 @@
 import { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import SearchComponent from '../components/Search'; // Adjust the path according to your project structure
+import SearchComponent from '../components/Search'; 
 import Layout from '../components/Layout'
-import React from 'react';
+import React, {useState} from 'react';
 import "../app/globals.css";
+import { LoadScript } from '@react-google-maps/api';
 
 const HomePage: NextPage = () => {
   const router = useRouter();
+  const [mapLoaded, setMapLoaded] = useState<boolean>(false);
 
-  // Define the handleSearch function
+
   const handleSearch = (query: string) => {
-    if (query.trim()) {
-        const formattedQuery = query.trim().replace(/\s+/g, '-'); // Replace spaces with dashes
-        // Route to the search results page with the query as the slug
-      router.push(`/${formattedQuery}`);
+    const trimmedQuery = query.trim();  // Trim leading and trailing spaces
+
+    if (trimmedQuery) {  // Check if the trimmed query is not empty
+        const formattedQuery = trimmedQuery.replace(/\s+/g, '-');  // Replace spaces with dashes
+        router.push(`/${encodeURIComponent(formattedQuery)}`);  // URL encode the query and navigate
     }
   };
+
 
   return (
     <><Layout>
@@ -43,7 +47,13 @@ const HomePage: NextPage = () => {
             <div className="items-center justify-center bg-white p-10 rounded-lg shadow-xl transition-all duration-500 ease-in-out">
               <div className="transition-all duration-500 ease-in-out">
                 {/* Pass handleSearch as a prop */}
-                <SearchComponent handleSearch={handleSearch} />
+                <LoadScript
+          googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}
+          onLoad={() => setMapLoaded(true)}
+          onError={() => console.error('Failed to load Google Maps script')}
+        >
+                { mapLoaded && <SearchComponent handleSearch={handleSearch} /> }
+                </LoadScript>
               </div>
             </div>
           </div>
