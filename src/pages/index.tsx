@@ -18,8 +18,9 @@ const HomePage: NextPage = () => {
     const trimmedQuery = query.trim();  // Trim leading and trailing spaces
 
     if (trimmedQuery) {  // Check if the trimmed query is not empty
-        const formattedQuery = trimmedQuery.replace(/\s+/g, '-');  // Replace spaces with dashes
-        router.push(`/${encodeURIComponent(formattedQuery)}`);  // URL encode the query and navigate
+      const formattedQuery = trimmedQuery.replace(/[\s,]+/g, '-');  // Replace spaces and commas with dashes
+
+         router.push(`/${encodeURIComponent(formattedQuery)}`);  // URL encode the query and navigate
     }
   };
 
