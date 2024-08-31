@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 
 interface SearchComponentProps {
   handleSearch: (query: string) => void;
@@ -36,75 +36,110 @@ const cities = [
 const SearchComponent: React.FC<SearchComponentProps> = ({ handleSearch }) => {
   const [inputValue, setInputValue] = useState<string>('');
   const [filteredCities, setFilteredCities] = useState<string[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
-  const [isValidCity, setIsValidCity] = useState<boolean>(false);
+  const [selectedCityIndex, setSelectedCityIndex] = useState<number>(-1); // Track selected city index
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setInputValue(value);
+    const query = e.target.value;
+    setInputValue(query);
 
-    if (value) {
-      const filtered = cities.filter(city =>
-        city.toLowerCase().includes(value.toLowerCase())
+    if (query.trim()) {
+      const matchingCities = cities.filter((city) =>
+        city.toLowerCase().includes(query.toLowerCase())
       );
-      setFilteredCities(filtered);
-      setShowSuggestions(true);
-      setIsValidCity(filtered.includes(value));
+      setFilteredCities(matchingCities);
+      setIsDropdownOpen(true);
+      setSelectedCityIndex(-1); // Reset the selected index when typing
     } else {
       setFilteredCities([]);
-      setShowSuggestions(false);
-      setIsValidCity(false);
+      setIsDropdownOpen(false);
     }
-  };
-
-  const handleSelectCity = (city: string) => {
-    setInputValue(city);
-    setFilteredCities([]);
-    setShowSuggestions(false);
-    setIsValidCity(true);
   };
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (isValidCity) {
+    if (inputValue.trim()) {
       handleSearch(inputValue.trim());
+      setIsDropdownOpen(false);
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (isDropdownOpen) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedCityIndex((prevIndex) =>
+          Math.min(prevIndex + 1, filteredCities.length - 1)
+        );
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedCityIndex((prevIndex) =>
+          Math.max(prevIndex - 1, 0)
+        );
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (selectedCityIndex >= 0) {
+          const selectedCity = filteredCities[selectedCityIndex];
+          setInputValue(selectedCity);
+          setIsDropdownOpen(false);
+          handleSearch(selectedCity);  // Trigger search directly
+        } else if (inputValue.trim()) {
+          handleSearch(inputValue.trim());
+          setIsDropdownOpen(false);
+        }
+      }
+    }
+  };
+
+  const handleCityClick = (city: string) => {
+    setInputValue(city);
+    setIsDropdownOpen(false);
+    handleSearch(city);
+  };
+
+  const disableSubmit = inputValue.trim() === '' || (filteredCities.length > 0 && selectedCityIndex >= 0 && inputValue !== filteredCities[selectedCityIndex]);
+
+  useEffect(() => {
+    if (selectedCityIndex >= 0 && filteredCities.length > 0) {
+      setInputValue(filteredCities[selectedCityIndex]);
+    }
+  }, [selectedCityIndex, filteredCities]);
+
   return (
     <form onSubmit={onSubmit} className="relative flex items-center w-full">
-      <div className="relative w-full">
-        <input
-          type="text"
-          placeholder="Enter a location..."
-          value={inputValue}
-          onChange={handleInputChange}
-          onFocus={() => setShowSuggestions(true)}
-          className="w-full px-6 py-4 text-xl md:text-2xl border border-gray-300 rounded-l-full focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-500 ease-in-out"
-        />
-        {showSuggestions && filteredCities.length > 0 && (
-          <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-b-md mt-1 max-h-60 overflow-y-auto shadow-lg">
-            {filteredCities.map((city, index) => (
-              <li
-                key={index}
-                onClick={() => handleSelectCity(city)}
-                className="px-4 py-2 cursor-pointer hover:bg-blue-100 transition-colors duration-200"
-              >
-                {city}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <input
+        type="text"
+        placeholder="Enter a location..."
+        value={inputValue}
+        onChange={handleInputChange}
+        onKeyDown={handleKeyDown}
+        className="w-full px-6 py-4 text-xl md:text-2xl border border-gray-300 rounded-l-full focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-500 ease-in-out"
+      />
       <button
         type="submit"
-        className={`px-8 py-4 text-xl md:text-2xl font-semibold rounded-r-full shadow-lg focus:outline-none transition-all duration-500 ease-in-out ${
-          isValidCity ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-400 text-gray-700 cursor-not-allowed'
+        disabled={disableSubmit}
+        className={`px-8 py-4 bg-blue-600 text-white text-xl md:text-2xl font-semibold rounded-r-full shadow-lg transition-all duration-500 ease-in-out ${
+          disableSubmit ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'
         }`}
-        disabled={!isValidCity}
       >
         Search
       </button>
+
+      {isDropdownOpen && filteredCities.length > 0 && (
+        <ul className="absolute top-full left-0 w-full bg-white border border-gray-300 rounded-b-lg shadow-lg mt-1 max-h-60 overflow-y-auto z-10">
+        {filteredCities.map((city, index) => (
+            <li
+              key={city}
+              onClick={() => handleCityClick(city)}
+              className={`px-6 py-3 cursor-pointer transition-colors ${
+                selectedCityIndex === index ? 'bg-blue-600 text-white' : 'hover:bg-gray-200'
+              }`}
+            >
+              {city}
+            </li>
+          ))}
+        </ul>
+      )}
     </form>
   );
 };
